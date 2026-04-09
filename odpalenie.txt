@@ -1,0 +1,27 @@
+Wymagania wstępne:
+Node.js (v18+)
+Docker Desktop
+Expo CLI
+Aplikacja Expo Go na telefonie (iOS/Android)
+
+1. Uruchomienie bazy danych:
+docker-compose up -d
+
+2. Konfiguracja środowiska (Backend):
+W folderze "backend" utwórz plik .env na podstawie poniższych zmiennych:
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=bapka_user
+DB_PASSWORD=bapka_password
+DB_NAME=bapka_db
+
+3. Uruchomienie backendu:
+cd backend
+npm install
+npm run start:dev
+
+4. Uruchomienie frontendu:
+cd frontend
+npm install
+npx expo start
+(Zeskanuj kod QR aplikacją Expo Go na swoim telefonie, aby testować na żywo)
