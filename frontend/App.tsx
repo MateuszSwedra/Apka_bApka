@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import {
-  useFonts,
-  Nunito_400Regular,
-  Nunito_700Bold,
-} from '@expo-google-fonts/nunito';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFonts, Nunito_400Regular, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { theme } from './src/theme/theme';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,12 +23,11 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Witaj w bApce!</Text>
-        <Text style={styles.text}>Aplikacja załadowana pomyślnie.</Text>
-      </View>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -35,29 +35,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    padding: 20,
-    justifyContent: 'center',
   },
   center: {
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.ui.borderRadius,
-    padding: 30,
-    ...theme.ui.shadow,
-    alignItems: 'center',
-  },
-  title: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.large,
-    color: theme.colors.primary,
-    marginBottom: 10,
-  },
-  text: {
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: theme.typography.sizes.normal,
-    color: theme.colors.textMain,
-    lineHeight: theme.typography.lineHeight,
   },
 });
