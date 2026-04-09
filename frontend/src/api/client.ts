@@ -5,9 +5,17 @@ export const apiClient = axios.create({
   timeout: 5000,
 });
 
-export const medicationsApi = {
+export const api = {
   takeMedication: async (scheduleId: string) => {
     const response = await apiClient.post(`/medications/${scheduleId}/take`);
     return response.data;
   },
+  createSenior: async (name: string) => {
+    const response = await apiClient.post('/users/senior', { name });
+    return response.data;
+  },
+  createSchedule: async (seniorId: string, name: string, dosage: string, cronExpression: string) => {
+    const response = await apiClient.post('/medications/schedule', { seniorId, name, dosage, cronExpression });
+    return response.data;
+  }
 };
