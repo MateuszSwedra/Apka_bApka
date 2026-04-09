@@ -8,7 +8,7 @@ Aplikacja Expo Go na telefonie (iOS/Android)
 docker-compose up -d
 
 2. Konfiguracja środowiska (Backend):
-W folderze "backend" utwórz plik .env na podstawie poniższych zmiennych:
+W folderze "backend" utwórz plik .env:
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=bapka_user
@@ -24,4 +24,4 @@ npm run start:dev
 cd frontend
 npm install
 npx expo start
-(Zeskanuj kod QR aplikacją Expo Go na swoim telefonie, aby testować na żywo)
+(Frontend obsługuje i18n - domyślnie język PL. Zmiana w src/i18n/index.ts lub poprzez hook useTranslation w kodzie).

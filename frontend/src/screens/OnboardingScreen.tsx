@@ -1,20 +1,23 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { theme } from '../theme/theme';
 
 export const OnboardingScreen = ({ navigation }: any) => {
+  const { t } = useTranslation();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.headerTitle}>Wybierz swoją rolę</Text>
+        <Text style={styles.headerTitle}>{t('roleSelection')}</Text>
         
         <TouchableOpacity 
           style={styles.cardButton}
           activeOpacity={0.8}
           onPress={() => navigation.navigate('SeniorPanel')}
         >
-          <Text style={styles.cardTitle}>Jestem Seniorem</Text>
-          <Text style={styles.cardSubtitle}>Chcę potwierdzać leki</Text>
+          <Text style={styles.cardTitle}>{t('seniorRole')}</Text>
+          <Text style={styles.cardSubtitle}>{t('seniorDesc')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -22,8 +25,8 @@ export const OnboardingScreen = ({ navigation }: any) => {
           activeOpacity={0.8}
           onPress={() => navigation.navigate('CaregiverPanel')}
         >
-          <Text style={[styles.cardTitle, styles.cardTitleCaregiver]}>Jestem Opiekunem</Text>
-          <Text style={[styles.cardSubtitle, styles.cardSubtitleCaregiver]}>Zarządzam lekami</Text>
+          <Text style={[styles.cardTitle, styles.cardTitleCaregiver]}>{t('caregiverRole')}</Text>
+          <Text style={[styles.cardSubtitle, styles.cardSubtitleCaregiver]}>{t('caregiverDesc')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

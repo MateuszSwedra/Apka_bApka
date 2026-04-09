@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { theme } from '../theme/theme';
 
 const MOCK_WARDS = [
@@ -9,6 +10,8 @@ const MOCK_WARDS = [
 ];
 
 export const CaregiverPanelScreen = ({ navigation }: any) => {
+  const { t } = useTranslation();
+
   const renderWardCard = ({ item }: { item: typeof MOCK_WARDS[0] }) => (
     <TouchableOpacity style={styles.card} activeOpacity={0.7}>
       <View style={styles.cardHeader}>
@@ -39,7 +42,7 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Feather name="arrow-left" size={24} color={theme.colors.textMain} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Twoi Podopieczni</Text>
+        <Text style={styles.headerTitle}>{t('wardsTitle')}</Text>
         <TouchableOpacity style={styles.settingsButton}>
           <Feather name="settings" size={24} color={theme.colors.textMain} />
         </TouchableOpacity>
@@ -56,7 +59,7 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
       <View style={styles.footer}>
         <TouchableOpacity style={styles.mainActionButton} activeOpacity={0.8}>
           <Feather name="plus" size={24} color={theme.colors.card} />
-          <Text style={styles.mainActionText}>Dodaj Podopiecznego</Text>
+          <Text style={styles.mainActionText}>{t('addWard')}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
