@@ -1,0 +1,80 @@
+# ==========================================
+# Zmienne środowiskowe i sekrety (KRYTYCZNE)
+# ==========================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# ==========================================
+# Zależności (Frontend & Backend)
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ==========================================
+# Backend (Node.js / NestJS / TypeScript)
+# ==========================================
+dist/
+build/
+out/
+.nest/
+coverage/
+.nyc_output/
+logs/
+*.log
+
+# ==========================================
+# Frontend (React Native / Expo)
+# ==========================================
+.expo/
+.expo-shared/
+web-build/
+expo-env.d.ts
+# Jeśli używamy Expo "Managed Workflow" (Continuous Native Generation), 
+# foldery ios/ i android/ są generowane w locie i ich nie wersjonujemy. 
+# Jeśli planujesz robić modyfikacje w kodzie natywnym, zakomentuj te dwie linie:
+ios/
+android/
+# Pliki binarne i klucze (Android/iOS)
+*.apk
+*.aab
+*.ipa
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+*.orig.*
+
+# ==========================================
+# Docker & Baza Danych (PostgreSQL)
+# ==========================================
+# Ignorujemy lokalne mapowanie wolumenów bazy danych (aby nie pushować danych Postgresa do GitHuba)
+pgdata/
+postgres-data/
+db_data/
+.docker-volumes/
+
+# ==========================================
+# IDE / Edytory kodu / System Operacyjny
+# ==========================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
