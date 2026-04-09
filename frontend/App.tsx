@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts, Nunito_400Regular, Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { theme } from './src/theme/theme';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
+import { CaregiverPanelScreen } from './src/screens/CaregiverPanelScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="CaregiverPanel" component={CaregiverPanelScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
