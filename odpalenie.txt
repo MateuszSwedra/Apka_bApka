@@ -15,13 +15,17 @@ DB_USER=bapka_user
 DB_PASSWORD=bapka_password
 DB_NAME=bapka_db
 
-3. Uruchomienie backendu:
+3. Konfiguracja środowiska (Frontend):
+W folderze "frontend" utwórz plik .env i podaj adres IP swojego komputera:
+EXPO_PUBLIC_API_URL=http://192.168.X.X:3000
+
+4. Uruchomienie backendu:
 cd backend
 npm install
 npm run start:dev
 
-4. Uruchomienie frontendu:
+5. Uruchomienie frontendu:
 cd frontend
 npm install
 npx expo start
-(Frontend obsługuje i18n - domyślnie język PL. Zmiana w src/i18n/index.ts lub poprzez hook useTranslation w kodzie).
+(Zeskanuj kod QR aplikacją Expo Go, telemetria/API idzie po lokalnym IP podanym w .env)
