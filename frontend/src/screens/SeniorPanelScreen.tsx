@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicat
 import { useTranslation } from 'react-i18next';
 import { Feather } from '@expo/vector-icons';
 import { theme } from '../theme/theme';
-import { medicationsApi } from '../api/client';
+import { api } from '../api/client';
 
 export const SeniorPanelScreen = ({ navigation }: any) => {
   const { t, i18n } = useTranslation();
@@ -19,15 +19,18 @@ export const SeniorPanelScreen = ({ navigation }: any) => {
     try {
       setIsLoading(true);
       const mockScheduleId = '123e4567-e89b-12d3-a456-426614174000';
-      await medicationsApi.takeMedication(mockScheduleId);
+      await api.takeMedication(mockScheduleId);
       setIsTaken(true);
-    } catch (error) {
-      Alert.alert('Błąd', 'Nie udało się zapisać informacji. Spróbuj ponownie.');
+    } catch (error: any) {
+      console.error("Szczegóły błędu:", error);
+      Alert.alert(
+        'Błąd techniczny', 
+        `Wiadomość: ${error.message}\nURL: ${process.env.EXPO_PUBLIC_API_URL}`
+      );
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>

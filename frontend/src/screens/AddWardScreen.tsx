@@ -13,7 +13,7 @@ export const AddWardScreen = ({ navigation }: any) => {
   const [medName, setMedName] = useState('');
   const [dosage, setDosage] = useState('');
 
-  const handleSave = async () => {
+const handleSave = async () => {
     if (!wardName || !medName || !dosage) {
       Alert.alert('Błąd', 'Wypełnij wszystkie pola');
       return;
@@ -26,8 +26,12 @@ export const AddWardScreen = ({ navigation }: any) => {
       Alert.alert('Sukces', t('successAdd'), [
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
-    } catch (error) {
-      Alert.alert('Błąd', 'Nie udało się połączyć z serwerem.');
+    } catch (error: any) {
+      console.error("Szczegóły błędu:", error);
+      Alert.alert(
+        'Błąd techniczny', 
+        `Wiadomość: ${error.message}\nURL: ${process.env.EXPO_PUBLIC_API_URL}`
+      );
     } finally {
       setIsLoading(false);
     }

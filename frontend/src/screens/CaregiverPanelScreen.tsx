@@ -57,7 +57,11 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
       />
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.mainActionButton} activeOpacity={0.8}>
+        <TouchableOpacity 
+          style={styles.mainActionButton} 
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('AddWard')}
+        >
           <Feather name="plus" size={24} color={theme.colors.card} />
           <Text style={styles.mainActionText}>{t('addWard')}</Text>
         </TouchableOpacity>

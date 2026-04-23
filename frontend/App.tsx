@@ -8,6 +8,7 @@ import { theme } from './src/theme/theme';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { CaregiverPanelScreen } from './src/screens/CaregiverPanelScreen';
 import { SeniorPanelScreen } from './src/screens/SeniorPanelScreen';
+import { AddWardScreen } from './src/screens/AddWardScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function App() {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="CaregiverPanel" component={CaregiverPanelScreen} />
         <Stack.Screen name="SeniorPanel" component={SeniorPanelScreen} />
+        <Stack.Screen name="AddWard" component={AddWardScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
