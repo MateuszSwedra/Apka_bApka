@@ -1,11 +1,14 @@
 export const theme = {
   colors: {
-    background: '#F5E6C7',
+    background: '#F0F9FF',
     card: '#FFFFFF',
-    textMain: '#332A26',
-    primary: '#2A5C55',
-    actionReady: '#388E3C',
-    actionAlert: '#C8553D',
+    textMain: '#2D3142',
+    primary: '#7FB5FF',
+    caregiverAccent: '#A5D8FF',
+    seniorAccent: '#FFC4C4',
+    actionReady: '#AEEA00',
+    actionAlert: '#FF8A80',
+    border: '#E1E8ED',
   },
   typography: {
     fontFamily: {
@@ -13,23 +16,21 @@ export const theme = {
       bold: 'Nunito_700Bold',
     },
     sizes: {
-      huge: 40,
-      large: 32,
+      huge: 42,
+      large: 34,
       normal: 18,
+      small: 14,
     },
-    lineHeight: 27,
+    lineHeight: 28,
   },
   ui: {
-    borderRadius: 20,
+    borderRadius: 30,
     shadow: {
-      shadowColor: '#332A26',
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
-      elevation: 4,
+      shadowColor: '#2D3142',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.05,
+      shadowRadius: 15,
+      elevation: 5,
     },
   },
 };

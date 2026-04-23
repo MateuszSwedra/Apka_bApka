@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { theme } from '../theme/theme';
@@ -8,30 +9,25 @@ import { api } from '../api/client';
 export const AddWardScreen = ({ navigation }: any) => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
-  
-  const [wardName, setWardName] = useState('');
-  const [medName, setMedName] = useState('');
-  const [dosage, setDosage] = useState('');
+  const [pin, setPin] = useState('');
 
-const handleSave = async () => {
-    if (!wardName || !medName || !dosage) {
-      Alert.alert('Błąd', 'Wypełnij wszystkie pola');
+  const handleSave = async () => {
+    if (pin.length !== 6) {
+      Alert.alert('Błąd', 'PIN musi składać się z 6 cyfr');
       return;
     }
 
     try {
       setIsLoading(true);
-      const senior = await api.createSenior(wardName);
-      await api.createSchedule(senior.id, medName, dosage, '0 8 * * *'); 
+      const caregiverId = await AsyncStorage.getItem('user_id');
+      if (!caregiverId) throw new Error('Brak ID Opiekuna');
+
+      await api.pairSenior(caregiverId, pin);
       Alert.alert('Sukces', t('successAdd'), [
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } catch (error: any) {
-      console.error("Szczegóły błędu:", error);
-      Alert.alert(
-        'Błąd techniczny', 
-        `Wiadomość: ${error.message}\nURL: ${process.env.EXPO_PUBLIC_API_URL}`
-      );
+      Alert.alert('Błąd', 'Nieprawidłowy kod PIN lub problem z połączeniem.');
     } finally {
       setIsLoading(false);
     }
@@ -49,46 +45,24 @@ const handleSave = async () => {
 
       <View style={styles.formContainer}>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>{t('wardNameLabel')}</Text>
+          <Text style={styles.label}>{t('pinLabel')}</Text>
           <TextInput
             style={styles.input}
-            value={wardName}
-            onChangeText={setWardName}
+            value={pin}
+            onChangeText={setPin}
+            placeholder="123456"
+            keyboardType="number-pad"
+            maxLength={6}
             placeholderTextColor="#999"
           />
         </View>
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>{t('medNameLabel')}</Text>
-          <TextInput
-            style={styles.input}
-            value={medName}
-            onChangeText={setMedName}
-            placeholderTextColor="#999"
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>{t('medDosageLabel')}</Text>
-          <TextInput
-            style={styles.input}
-            value={dosage}
-            onChangeText={setDosage}
-            placeholderTextColor="#999"
-          />
-        </View>
-
-        <TouchableOpacity 
-          style={styles.saveButton} 
-          activeOpacity={0.8}
-          onPress={handleSave}
-          disabled={isLoading}
-        >
+        <TouchableOpacity style={styles.saveButton} activeOpacity={0.8} onPress={handleSave} disabled={isLoading}>
           {isLoading ? (
             <ActivityIndicator color={theme.colors.card} />
           ) : (
             <>
-              <Feather name="save" size={24} color={theme.colors.card} />
+              <Feather name="link" size={24} color={theme.colors.card} />
               <Text style={styles.saveButtonText}>{t('saveBtn')}</Text>
             </>
           )}
@@ -99,62 +73,14 @@ const handleSave = async () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-  backButton: {
-    padding: 8,
-    marginLeft: -8,
-  },
-  headerTitle: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.large,
-    color: theme.colors.textMain,
-  },
-  formContainer: {
-    padding: 20,
-    gap: 24,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: 16,
-    color: theme.colors.textMain,
-  },
-  input: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.ui.borderRadius,
-    padding: 16,
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: 18,
-    color: theme.colors.textMain,
-    ...theme.ui.shadow,
-  },
-  saveButton: {
-    backgroundColor: theme.colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: theme.ui.borderRadius,
-    ...theme.ui.shadow,
-    gap: 10,
-    marginTop: 20,
-  },
-  saveButtonText: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.normal,
-    color: theme.colors.card,
-  },
+  safeArea: { flex: 1, backgroundColor: theme.colors.background },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 20 },
+  backButton: { padding: 8, marginLeft: -8 },
+  headerTitle: { fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.sizes.large, color: theme.colors.textMain },
+  formContainer: { padding: 24, gap: 24 },
+  inputGroup: { gap: 12 },
+  label: { fontFamily: theme.typography.fontFamily.bold, fontSize: 18, color: theme.colors.textMain, textAlign: 'center' },
+  input: { backgroundColor: theme.colors.card, borderRadius: theme.ui.borderRadius, padding: 20, fontFamily: theme.typography.fontFamily.bold, fontSize: 32, color: theme.colors.primary, textAlign: 'center', letterSpacing: 5, ...theme.ui.shadow },
+  saveButton: { backgroundColor: theme.colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20, borderRadius: theme.ui.borderRadius, ...theme.ui.shadow, gap: 10, marginTop: 20 },
+  saveButtonText: { fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.sizes.normal, color: theme.colors.card },
 });

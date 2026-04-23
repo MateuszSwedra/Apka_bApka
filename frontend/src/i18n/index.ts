@@ -13,13 +13,11 @@ const resources = {
       addWard: 'Add Ward',
       seniorWelcome: 'Hello!',
       takeMedsBtn: 'I TOOK MY MEDS',
-      medsTakenInfo: 'Next dose: Evening',
       changeLang: 'Zmień na Polski',
-      wardNameLabel: "Senior's Name",
-      medNameLabel: "Medication Name",
-      medDosageLabel: "Dosage (e.g., 1 pill)",
-      saveBtn: "Save Profile",
-      successAdd: "Successfully added!",
+      pinLabel: 'Enter 6-digit PIN of the Senior',
+      saveBtn: 'Connect',
+      successAdd: 'Successfully connected!',
+      yourPin: 'Your PIN:',
     },
   },
   pl: {
@@ -33,16 +31,16 @@ const resources = {
       addWard: 'Dodaj Podopiecznego',
       seniorWelcome: 'Witaj!',
       takeMedsBtn: 'WZIĄŁEM LEKI',
-      medsTakenInfo: 'Następna dawka: Wieczór',
       changeLang: 'Change to English',
-      wardNameLabel: "Imię Podopiecznego",
-      medNameLabel: "Nazwa Leku",
-      medDosageLabel: "Dawka (np. 1 tabletka)",
-      saveBtn: "Zapisz Profil",
-      successAdd: "Pomyślnie dodano!",
+      pinLabel: 'Wpisz 6-cyfrowy PIN Seniora',
+      saveBtn: 'Połącz Podopiecznego',
+      successAdd: 'Połączono pomyślnie!',
+      yourPin: 'Twój kod PIN:',
     },
   },
 };
+
+
 
 i18n.use(initReactI18next).init({
   resources,

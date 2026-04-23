@@ -1,37 +1,56 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { theme } from '../theme/theme';
-
-const MOCK_WARDS = [
-  { id: '1', name: 'Babcia Janina', status: 'Wszystkie leki przyjęte', isAlert: false },
-  { id: '2', name: 'Dziadek Stefan', status: 'Pominięto dawkę poranną', isAlert: true },
-];
+import { api } from '../api/client';
 
 export const CaregiverPanelScreen = ({ navigation }: any) => {
   const { t } = useTranslation();
+  const [wards, setWards] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const renderWardCard = ({ item }: { item: typeof MOCK_WARDS[0] }) => (
+  const fetchWards = async () => {
+    try {
+      const caregiverId = await AsyncStorage.getItem('user_id');
+      if (caregiverId) {
+        const data = await api.getWards(caregiverId);
+        setWards(data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchWards();
+    }, [])
+  );
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear();
+    navigation.replace('Onboarding');
+  };
+
+  const renderWardCard = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.card} activeOpacity={0.7}>
       <View style={styles.cardHeader}>
         <View style={styles.avatarContainer}>
-          <Feather name="user" size={24} color={theme.colors.primary} />
+          <Feather name="user" size={24} color={theme.colors.card} />
         </View>
         <View style={styles.cardInfo}>
           <Text style={styles.wardName}>{item.name}</Text>
           <View style={styles.statusRow}>
-            <Feather 
-              name={item.isAlert ? "alert-circle" : "check-circle"} 
-              size={14} 
-              color={item.isAlert ? theme.colors.actionAlert : theme.colors.actionReady} 
-            />
-            <Text style={[styles.wardStatus, item.isAlert && styles.wardStatusAlert]}>
-              {item.status}
-            </Text>
+            <Feather name="clock" size={14} color={theme.colors.textMain} />
+            <Text style={styles.wardStatus}>Brak zaplanowanych leków</Text>
           </View>
         </View>
-        <Feather name="chevron-right" size={24} color={theme.colors.textMain} />
+        <Feather name="chevron-right" size={24} color={theme.colors.primary} />
       </View>
     </TouchableOpacity>
   );
@@ -39,29 +58,28 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Feather name="arrow-left" size={24} color={theme.colors.textMain} />
+        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+          <Feather name="log-out" size={24} color={theme.colors.textMain} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('wardsTitle')}</Text>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Feather name="settings" size={24} color={theme.colors.textMain} />
-        </TouchableOpacity>
+        <View style={{ width: 44 }} />
       </View>
 
-      <FlatList
-        data={MOCK_WARDS}
-        keyExtractor={(item) => item.id}
-        renderItem={renderWardCard}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-      />
+      {isLoading ? (
+        <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 50 }} />
+      ) : (
+        <FlatList
+          data={wards}
+          keyExtractor={(item) => item.id}
+          renderItem={renderWardCard}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<Text style={{textAlign: 'center', marginTop: 50}}>Brak podopiecznych. Dodaj kogoś!</Text>}
+        />
+      )}
 
       <View style={styles.footer}>
-        <TouchableOpacity 
-          style={styles.mainActionButton} 
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('AddWard')}
-        >
+        <TouchableOpacity style={styles.mainActionButton} activeOpacity={0.8} onPress={() => navigation.navigate('AddWard')}>
           <Feather name="plus" size={24} color={theme.colors.card} />
           <Text style={styles.mainActionText}>{t('addWard')}</Text>
         </TouchableOpacity>
@@ -71,93 +89,19 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  backButton: {
-    padding: 8,
-    marginLeft: -8,
-  },
-  settingsButton: {
-    padding: 8,
-    marginRight: -8,
-  },
-  headerTitle: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.large,
-    color: theme.colors.textMain,
-  },
-  listContainer: {
-    padding: 20,
-    gap: 16,
-  },
-  card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.ui.borderRadius,
-    padding: 16,
-    ...theme.ui.shadow,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: theme.colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  cardInfo: {
-    flex: 1,
-  },
-  wardName: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.normal,
-    color: theme.colors.textMain,
-    marginBottom: 4,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  wardStatus: {
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: 14,
-    color: theme.colors.actionReady,
-  },
-  wardStatusAlert: {
-    color: theme.colors.actionAlert,
-  },
-  footer: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  mainActionButton: {
-    backgroundColor: theme.colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: theme.ui.borderRadius,
-    ...theme.ui.shadow,
-    gap: 10,
-  },
-  mainActionText: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.normal,
-    color: theme.colors.card,
-  },
+  safeArea: { flex: 1, backgroundColor: theme.colors.background },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 20 },
+  headerButton: { padding: 10, backgroundColor: theme.colors.card, borderRadius: 16, ...theme.ui.shadow },
+  headerTitle: { fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.sizes.large, color: theme.colors.textMain },
+  listContainer: { padding: 24, gap: 16 },
+  card: { backgroundColor: theme.colors.card, borderRadius: theme.ui.borderRadius, padding: 20, ...theme.ui.shadow },
+  cardHeader: { flexDirection: 'row', alignItems: 'center' },
+  avatarContainer: { width: 56, height: 56, borderRadius: 28, backgroundColor: theme.colors.caregiverAccent, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  cardInfo: { flex: 1 },
+  wardName: { fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.sizes.normal, color: theme.colors.textMain, marginBottom: 4 },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  wardStatus: { fontFamily: theme.typography.fontFamily.regular, fontSize: theme.typography.sizes.small, color: theme.colors.textMain, opacity: 0.7 },
+  footer: { padding: 24, paddingBottom: 40 },
+  mainActionButton: { backgroundColor: theme.colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20, borderRadius: theme.ui.borderRadius, ...theme.ui.shadow, gap: 10 },
+  mainActionText: { fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.sizes.normal, color: theme.colors.card },
 });

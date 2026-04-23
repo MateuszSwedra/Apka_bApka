@@ -18,6 +18,9 @@ export class User {
   @Column({ type: 'enum', enum: UserRole })
   role!: UserRole;
 
+  @Column({ nullable: true, unique: true })
+  pairingCode!: string;
+
   @Column({ nullable: true })
   fcmToken!: string;
 

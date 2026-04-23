@@ -10,8 +10,16 @@ export const api = {
     const response = await apiClient.post(`/medications/${scheduleId}/take`);
     return response.data;
   },
-  createSenior: async (name: string) => {
-    const response = await apiClient.post('/users/senior', { name });
+  register: async (role: string, name: string) => {
+    const response = await apiClient.post('/users/register', { role, name });
+    return response.data;
+  },
+  pairSenior: async (caregiverId: string, pairingCode: string) => {
+    const response = await apiClient.post('/users/pair', { caregiverId, pairingCode });
+    return response.data;
+  },
+  getWards: async (caregiverId: string) => {
+    const response = await apiClient.get(`/users/${caregiverId}/wards`);
     return response.data;
   },
   createSchedule: async (seniorId: string, name: string, dosage: string, cronExpression: string) => {

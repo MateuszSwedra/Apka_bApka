@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
 import { theme } from '../theme/theme';
 import { api } from '../api/client';
 
 export const SeniorPanelScreen = ({ navigation }: any) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [isTaken, setIsTaken] = useState(false);
+  const [pinCode, setPinCode] = useState<string | null>(null);
 
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'pl' : 'en';
-    i18n.changeLanguage(newLang);
+  useEffect(() => {
+    const loadPin = async () => {
+      const savedPin = await AsyncStorage.getItem('pairing_code');
+      setPinCode(savedPin);
+    };
+    loadPin();
+  }, []);
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear();
+    navigation.replace('Onboarding');
   };
 
   const handleTakeMedication = async () => {
@@ -22,37 +32,29 @@ export const SeniorPanelScreen = ({ navigation }: any) => {
       await api.takeMedication(mockScheduleId);
       setIsTaken(true);
     } catch (error: any) {
-      console.error("Szczegóły błędu:", error);
-      Alert.alert(
-        'Błąd techniczny', 
-        `Wiadomość: ${error.message}\nURL: ${process.env.EXPO_PUBLIC_API_URL}`
-      );
+      Alert.alert('Błąd techniczny', error.message);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={toggleLanguage} style={styles.langButton} activeOpacity={0.8}>
-          <Feather name="globe" size={20} color={theme.colors.primary} />
-          <Text style={styles.langButtonText}>{t('changeLang')}</Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+          <Feather name="log-out" size={24} color={theme.colors.textMain} />
         </TouchableOpacity>
+        {pinCode && (
+          <View style={styles.pinContainer}>
+            <Text style={styles.pinLabel}>{t('yourPin')}</Text>
+            <Text style={styles.pinValue}>{pinCode}</Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.container}>
         <View style={styles.greetingContainer}>
           <Text style={styles.greeting}>{t('seniorWelcome')}</Text>
-          <Text style={styles.subGreeting}>Janina</Text>
-        </View>
-
-        <View style={styles.infoCard}>
-          <Feather name="clock" size={28} color={theme.colors.primary} />
-          <View style={styles.infoTextContainer}>
-            <Text style={styles.infoLabel}>Następna dawka:</Text>
-            <Text style={styles.infoValue}>18:00 - Wieczór</Text>
-            <Text style={styles.infoPills}>Ibuprofen (1 tabletka)</Text>
-          </View>
         </View>
 
         <TouchableOpacity 
@@ -63,9 +65,9 @@ export const SeniorPanelScreen = ({ navigation }: any) => {
         >
           <View style={styles.iconCircle}>
             {isLoading ? (
-              <ActivityIndicator size="large" color={theme.colors.actionReady} />
+              <ActivityIndicator size="large" color={theme.colors.seniorAccent} />
             ) : (
-              <Feather name={isTaken ? "check-circle" : "check"} size={40} color={isTaken ? theme.colors.actionReady : theme.colors.actionReady} />
+              <Feather name={isTaken ? "check" : "bell"} size={50} color={isTaken ? theme.colors.actionReady : theme.colors.seniorAccent} />
             )}
           </View>
           <Text style={styles.giantButtonText}>
@@ -78,106 +80,17 @@ export const SeniorPanelScreen = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 20,
-  },
-  langButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.ui.borderRadius,
-    gap: 8,
-    ...theme.ui.shadow,
-  },
-  langButtonText: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: 16,
-    color: theme.colors.primary,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  greetingContainer: {
-    alignItems: 'center',
-  },
-  greeting: {
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: theme.typography.sizes.large,
-    color: theme.colors.textMain,
-  },
-  subGreeting: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: theme.typography.sizes.huge,
-    color: theme.colors.primary,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.card,
-    width: '100%',
-    padding: 24,
-    borderRadius: theme.ui.borderRadius,
-    alignItems: 'center',
-    gap: 20,
-    ...theme.ui.shadow,
-  },
-  infoTextContainer: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: 14,
-    color: theme.colors.textMain,
-    opacity: 0.7,
-  },
-  infoValue: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: 22,
-    color: theme.colors.textMain,
-    marginTop: 4,
-  },
-  infoPills: {
-    fontFamily: theme.typography.fontFamily.regular,
-    fontSize: 16,
-    color: theme.colors.primary,
-    marginTop: 4,
-  },
-  giantButton: {
-    backgroundColor: theme.colors.actionReady,
-    width: '100%',
-    paddingVertical: 30,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    ...theme.ui.shadow,
-    elevation: 8,
-  },
-  giantButtonSuccess: {
-    backgroundColor: '#81C784',
-  },
-  iconCircle: {
-    backgroundColor: theme.colors.card,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  giantButtonText: {
-    fontFamily: theme.typography.fontFamily.bold,
-    fontSize: 24,
-    color: theme.colors.card,
-    textAlign: 'center',
-  },
+  safeArea: { flex: 1, backgroundColor: theme.colors.background },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24 },
+  headerButton: { padding: 10, backgroundColor: theme.colors.card, borderRadius: 16, ...theme.ui.shadow },
+  pinContainer: { alignItems: 'flex-end' },
+  pinLabel: { fontFamily: theme.typography.fontFamily.regular, fontSize: 12, color: theme.colors.textMain },
+  pinValue: { fontFamily: theme.typography.fontFamily.bold, fontSize: 24, color: theme.colors.primary, letterSpacing: 2 },
+  container: { flex: 1, paddingHorizontal: 24, justifyContent: 'center', alignItems: 'center', gap: 50 },
+  greetingContainer: { alignItems: 'center', width: '100%' },
+  greeting: { fontFamily: theme.typography.fontFamily.regular, fontSize: theme.typography.sizes.large, color: theme.colors.textMain },
+  giantButton: { backgroundColor: theme.colors.seniorAccent, width: '100%', paddingVertical: 40, borderRadius: 40, justifyContent: 'center', alignItems: 'center', gap: 20, ...theme.ui.shadow },
+  giantButtonSuccess: { backgroundColor: theme.colors.actionReady },
+  iconCircle: { backgroundColor: theme.colors.card, width: 100, height: 100, borderRadius: 50, justifyContent: 'center', alignItems: 'center' },
+  giantButtonText: { fontFamily: theme.typography.fontFamily.bold, fontSize: 26, color: theme.colors.textMain, textAlign: 'center' },
 });

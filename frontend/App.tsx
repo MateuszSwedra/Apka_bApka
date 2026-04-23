@@ -1,9 +1,12 @@
 import './src/i18n';
-import React from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Nunito_400Regular, Nunito_700Bold } from '@expo-google-fonts/nunito';
+import i18n from 'i18next';
+
 import { theme } from './src/theme/theme';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { CaregiverPanelScreen } from './src/screens/CaregiverPanelScreen';
@@ -13,14 +16,40 @@ import { AddWardScreen } from './src/screens/AddWardScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [initialRoute, setInitialRoute] = useState('Onboarding');
+
   const [fontsLoaded] = useFonts({
     Nunito_400Regular,
     Nunito_700Bold,
   });
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    const checkConfig = async () => {
+      try {
+        const savedLang = await AsyncStorage.getItem('user_lang');
+        const savedRole = await AsyncStorage.getItem('user_role');
+
+        if (savedLang) {
+          i18n.changeLanguage(savedLang);
+        }
+
+        if (savedRole) {
+          setInitialRoute(savedRole === 'CAREGIVER' ? 'CaregiverPanel' : 'SeniorPanel');
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkConfig();
+  }, []);
+
+  if (!fontsLoaded || isLoading) {
     return (
-      <View style={[styles.container, styles.center]}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
@@ -28,7 +57,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="CaregiverPanel" component={CaregiverPanelScreen} />
         <Stack.Screen name="SeniorPanel" component={SeniorPanelScreen} />
@@ -39,12 +68,10 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loader: {
     flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  center: {
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: theme.colors.background,
   },
 });
