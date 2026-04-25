@@ -12,7 +12,7 @@ export class MedicationsController {
 
   @Get('senior/:seniorId')
   async getSchedules(@Param('seniorId') seniorId: string) {
-    return this.medicationsService.getSeniorSchedules(seniorId);
+    return this.medicationsService.getSchedulesForSenior(seniorId);
   }
 
   @Post('schedule')

@@ -5,19 +5,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Nunito_400Regular, Nunito_700Bold } from '@expo-google-fonts/nunito';
-import i18n from 'i18next';
 
 import { theme } from './src/theme/theme';
-import { OnboardingScreen } from './src/screens/OnboardingScreen';
+import { AuthScreen } from './src/screens/AuthScreen';
+import { RoleSelectionScreen } from './src/screens/RoleSelectionScreen';
 import { CaregiverPanelScreen } from './src/screens/CaregiverPanelScreen';
 import { SeniorPanelScreen } from './src/screens/SeniorPanelScreen';
 import { AddWardScreen } from './src/screens/AddWardScreen';
+import { WardDetailsScreen } from './src/screens/WardDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState('Onboarding');
+  const [initialRoute, setInitialRoute] = useState('Auth');
 
   const [fontsLoaded] = useFonts({
     Nunito_400Regular,
@@ -25,17 +26,17 @@ export default function App() {
   });
 
   useEffect(() => {
-    const checkConfig = async () => {
+    const checkState = async () => {
       try {
-        const savedLang = await AsyncStorage.getItem('user_lang');
-        const savedRole = await AsyncStorage.getItem('user_role');
+        const userId = await AsyncStorage.getItem('user_id');
+        const role = await AsyncStorage.getItem('user_role');
 
-        if (savedLang) {
-          i18n.changeLanguage(savedLang);
-        }
-
-        if (savedRole) {
-          setInitialRoute(savedRole === 'CAREGIVER' ? 'CaregiverPanel' : 'SeniorPanel');
+        if (!userId) {
+          setInitialRoute('Auth');
+        } else if (!role) {
+          setInitialRoute('RoleSelection');
+        } else {
+          setInitialRoute(role === 'CAREGIVER' ? 'CaregiverPanel' : 'SeniorPanel');
         }
       } catch (e) {
         console.error(e);
@@ -43,8 +44,7 @@ export default function App() {
         setIsLoading(false);
       }
     };
-
-    checkConfig();
+    checkState();
   }, []);
 
   if (!fontsLoaded || isLoading) {
@@ -58,10 +58,12 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="Auth" component={AuthScreen} />
+        <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
         <Stack.Screen name="CaregiverPanel" component={CaregiverPanelScreen} />
         <Stack.Screen name="SeniorPanel" component={SeniorPanelScreen} />
         <Stack.Screen name="AddWard" component={AddWardScreen} />
+        <Stack.Screen name="WardDetails" component={WardDetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

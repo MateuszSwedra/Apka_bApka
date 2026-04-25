@@ -34,7 +34,7 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
 
   const handleLogout = async () => {
     await AsyncStorage.clear();
-    navigation.replace('Onboarding');
+    navigation.replace('Auth');
   };
 
   const renderWardCard = ({ item }: { item: any }) => (
@@ -47,7 +47,7 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
           <Text style={styles.wardName}>{item.name}</Text>
           <View style={styles.statusRow}>
             <Feather name="clock" size={14} color={theme.colors.textMain} />
-            <Text style={styles.wardStatus}>Brak zaplanowanych leków</Text>
+            <Text style={styles.wardStatus}>{t('clickToManageMeds')}</Text>
           </View>
         </View>
         <Feather name="chevron-right" size={24} color={theme.colors.primary} />
@@ -74,7 +74,7 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
           renderItem={renderWardCard}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<Text style={{textAlign: 'center', marginTop: 50}}>Brak podopiecznych. Dodaj kogoś!</Text>}
+          ListEmptyComponent={<Text style={{textAlign: 'center', marginTop: 50}}>{t('noWardsAddSome')}</Text>}
         />
       )}
 
