@@ -32,7 +32,7 @@ export class MedicationsService {
     return this.logRepo.save(log);
   }
 
-  async getSeniorSchedules(seniorId: string): Promise<MedicationSchedule[]> {
+  async getSchedulesForSenior(seniorId: string): Promise<MedicationSchedule[]> {
     return this.scheduleRepo.find({
       where: { senior: { id: seniorId } },
       relations: ['logs'],

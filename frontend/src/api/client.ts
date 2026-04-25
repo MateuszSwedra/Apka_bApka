@@ -6,24 +6,39 @@ export const apiClient = axios.create({
 });
 
 export const api = {
-  takeMedication: async (scheduleId: string) => {
-    const response = await apiClient.post(`/medications/${scheduleId}/take`);
-    return response.data;
+  // --- AUTORYZACJA ---
+  registerAccount: async (email: string, pass: string) => {
+    const res = await apiClient.post('/users/auth/register', { email, password: pass });
+    return res.data;
   },
-  register: async (role: string, name: string) => {
-    const response = await apiClient.post('/users/register', { role, name });
-    return response.data;
+  login: async (email: string, pass: string) => {
+    const res = await apiClient.post('/users/auth/login', { email, password: pass });
+    return res.data;
   },
+  setRole: async (userId: string, role: string, name: string) => {
+    const res = await apiClient.post(`/users/${userId}/role`, { role, name });
+    return res.data;
+  },
+  
+  // --- OPIEKUN ---
   pairSenior: async (caregiverId: string, pairingCode: string) => {
-    const response = await apiClient.post('/users/pair', { caregiverId, pairingCode });
-    return response.data;
+    const res = await apiClient.post('/users/pair', { caregiverId, pairingCode });
+    return res.data;
   },
   getWards: async (caregiverId: string) => {
-    const response = await apiClient.get(`/users/${caregiverId}/wards`);
-    return response.data;
+    const res = await apiClient.get(`/users/${caregiverId}/wards`);
+    return res.data;
   },
   createSchedule: async (seniorId: string, name: string, dosage: string, cronExpression: string) => {
-    const response = await apiClient.post('/medications/schedule', { seniorId, name, dosage, cronExpression });
-    return response.data;
+    const res = await apiClient.post('/medications/schedule', { seniorId, name, dosage, cronExpression });
+    return res.data;
+  },
+  getSeniorMedications: async (seniorId: string) => {
+    const res = await apiClient.get(`/medications/senior/${seniorId}`);
+    return res.data;
+  },
+  takeMedication: async (scheduleId: string) => {
+    const res = await apiClient.post(`/medications/${scheduleId}/take`);
+    return res.data;
   }
 };

@@ -12,17 +12,23 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Column({ unique: true })
+  email!: string;
+
   @Column()
-  name!: string;
-
-  @Column({ type: 'enum', enum: UserRole })
-  role!: UserRole;
-
-  @Column({ nullable: true, unique: true })
-  pairingCode!: string;
+  password!: string;
 
   @Column({ nullable: true })
-  fcmToken!: string;
+  name?: string;
+
+  @Column({ type: 'enum', enum: UserRole, nullable: true })
+  role?: UserRole;
+
+  @Column({ nullable: true, unique: true })
+  pairingCode?: string;
+
+  @Column({ nullable: true })
+  fcmToken?: string;
 
   @ManyToMany(() => User)
   @JoinTable({

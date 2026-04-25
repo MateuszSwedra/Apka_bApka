@@ -6,9 +6,19 @@ import { UserRole } from '../database/entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('register')
-  async register(@Body('role') role: UserRole, @Body('name') name: string) {
-    return this.usersService.register(role, name);
+  @Post('auth/register')
+  async register(@Body('email') email: string, @Body('password') pass: string) {
+    return this.usersService.registerAccount(email, pass);
+  }
+
+  @Post('auth/login')
+  async login(@Body('email') email: string, @Body('password') pass: string) {
+    return this.usersService.login(email, pass);
+  }
+
+  @Post(':id/role')
+  async setRole(@Param('id') id: string, @Body('role') role: UserRole, @Body('name') name: string) {
+    return this.usersService.setRole(id, role, name);
   }
 
   @Post('pair')
