@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
 
   const fetchWards = async () => {
     try {
+      setIsLoading(true);
       const caregiverId = await AsyncStorage.getItem('user_id');
       if (caregiverId) {
         const data = await api.getWards(caregiverId);
@@ -26,8 +27,9 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
     }
   };
 
+  // Odświeżamy listę za każdym razem, gdy wracamy do tego ekranu
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       fetchWards();
     }, [])
   );
@@ -38,7 +40,12 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
   };
 
   const renderWardCard = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.card} activeOpacity={0.7}>
+    <TouchableOpacity 
+      style={styles.card} 
+      activeOpacity={0.7}
+      // TO JEST KLUCZOWA POPRAWKA:
+      onPress={() => navigation.navigate('WardDetails', { ward: item })}
+    >
       <View style={styles.cardHeader}>
         <View style={styles.avatarContainer}>
           <Feather name="user" size={24} color={theme.colors.card} />
@@ -74,12 +81,20 @@ export const CaregiverPanelScreen = ({ navigation }: any) => {
           renderItem={renderWardCard}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<Text style={{textAlign: 'center', marginTop: 50}}>{t('noWardsAddSome')}</Text>}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>{t('noWardsAddSome')}</Text>
+            </View>
+          }
         />
       )}
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.mainActionButton} activeOpacity={0.8} onPress={() => navigation.navigate('AddWard')}>
+        <TouchableOpacity 
+          style={styles.mainActionButton} 
+          activeOpacity={0.8} 
+          onPress={() => navigation.navigate('AddWard')}
+        >
           <Feather name="plus" size={24} color={theme.colors.card} />
           <Text style={styles.mainActionText}>{t('addWard')}</Text>
         </TouchableOpacity>
@@ -104,4 +119,6 @@ const styles = StyleSheet.create({
   footer: { padding: 24, paddingBottom: 40 },
   mainActionButton: { backgroundColor: theme.colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 20, borderRadius: theme.ui.borderRadius, ...theme.ui.shadow, gap: 10 },
   mainActionText: { fontFamily: theme.typography.fontFamily.bold, fontSize: theme.typography.sizes.normal, color: theme.colors.card },
+  emptyContainer: { alignItems: 'center', marginTop: 100 },
+  emptyText: { fontFamily: theme.typography.fontFamily.regular, color: theme.colors.textMain, opacity: 0.5 }
 });
